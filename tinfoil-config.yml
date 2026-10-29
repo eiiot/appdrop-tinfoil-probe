@@ -10,7 +10,7 @@ networks:
 
 containers:
   - name: app
-    image: ghcr.io/eiiot/appdrop-tinfoil-probe:placeholder
+    image: "ghcr.io/eiiot/appdrop-tinfoil-probe@sha256:0f2e84d429151e1a59efe844206ca940c793578a0406b7dc4c28239dfb4441f0"
     networks: [relay]
 
 shim:
