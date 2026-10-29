@@ -1,39 +1,25 @@
 # Tinfoil transport trial
 
-Disposable transport probe for the proposed AppDrop attested worker. No phone
-pairing records, Apple credentials, or production changes.
+An isolated probe for AppDrop's proposed attested worker. It contains no phone
+pairing records, Apple credentials, or production integration.
 
-The probe source in `app/` is the previously locally verified Node server:
-health check, binary WebSocket echo, heartbeat, and fixed outbound HTTPS to the
-Tuft relay. The Docker build context is explicitly allowlisted.
+**The cloud trial passed and the instance is stopped.** Read the
+[trial report](REPORT.md) for checks, evidence, limitations, and shutdown
+confirmation. The successful measured release is
+[v0.0.2](https://github.com/eiiot/appdrop-tinfoil-probe/releases/tag/v0.0.2).
 
-CLI v0.19.12 is installed at `/private/tmp/appdrop-tinfoil-cli/tinfoil`; its
-archive was checked against the official GitHub release's SHA-256 digest.
-`run-tinfoil.py` reads the organization admin key from the submitted Ocho secret
-file into the CLI environment and uses a task-local configuration path.
+## Probe
 
-## Next steps
+`app/` contains a Node server with a health check, binary WebSocket echo, and a
+fixed outbound HTTPS check to `tuft-rendezvous.fly.dev`. The Docker context uses
+an explicit file allowlist. `check-transport.mjs` tests a localhost proxy that
+must verify the remote enclave before forwarding traffic.
 
-1. Wait for the submitted organization admin key. Use `whoami` and read-only
-   container/host listing to confirm organization access and available capacity.
-2. Prepare a separate public configuration repository and measured release.
-   Configuration and disposable probe source may be public; credentials must
-   remain outside the repository and Docker context.
-3. Deploy one non-debug CPU instance for the trial and stop it after checks.
-4. Verify exact release attestation, reject an incorrect release, and test the
-   long-lived binary connection plus outbound HTTPS under attested TLS.
+The trial used Tinfoil CLI 0.19.12, CVM runtime 0.14.17, and measurement action
+0.14.1. The release workflows originate from Tinfoil's public template, with
+the image build context restricted to `app/` and the measurement action updated
+to the current compatible version. CI pins each published image by SHA-256.
 
-The organization admin key works. Read-only API checks report Tier 1 with a
-five-container quota and no existing containers. The host list is empty; that
-has not yet established whether automatic placement works. Local transport
-checks passed in the Evervault preparation, but Tinfoil attestation and routing
-have not been tested.
-
-The measured-release workflows come from Tinfoil's public-container template
-at commit `1d4369c1a284173fded52607099592ebff558211`. The image build context is
-restricted to `app/`. CI replaces the draft image reference in the configuration
-with the published SHA-256 digest before creating the measured release.
-
-Tinfoil's volume/private-secret/automatic-unlock features are documented as beta.
-This transport trial does not implement key recovery, release approval, passkey
-authorization, or the full phone protocol.
+Only the transport foundation has been exercised. This repository does not
+implement passkey ownership, encrypted phone-state recovery, the production
+release-approval policy, or the phone install protocol.
