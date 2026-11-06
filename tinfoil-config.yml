@@ -8,7 +8,7 @@ networks:
 
 containers:
   - name: app
-    image: "ghcr.io/eiiot/appdrop-tinfoil-probe@sha256:0f2e84d429151e1a59efe844206ca940c793578a0406b7dc4c28239dfb4441f0"
+    image: "ghcr.io/eiiot/appdrop-tinfoil-probe@sha256:f3cc39aa3baa0a90fd03bf88b2c3c4cdd1f7590bfe3c5108f89290ddb2775791" # v0.3.0
     attestation: true
     env:
       - HOST_URL        # per-instance variable: where the operator's host is
