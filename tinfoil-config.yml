@@ -5,7 +5,7 @@ memory: 8192
 
 containers:
   - name: app
-    image: "ghcr.io/eiiot/appdrop-tinfoil-probe@sha256:0f2e84d429151e1a59efe844206ca940c793578a0406b7dc4c28239dfb4441f0"
+    image: "ghcr.io/eiiot/appdrop-tinfoil-probe@sha256:fea6c7455a96912fc20c5e6c0d1530977b6500d899e88580224933b7f0294f7a" # v0.1.0
     attestation: true
 
 shim:
