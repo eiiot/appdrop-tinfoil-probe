@@ -8,7 +8,7 @@ networks:
 
 containers:
   - name: app
-    image: "ghcr.io/eiiot/appdrop-tinfoil-probe@sha256:0f2e84d429151e1a59efe844206ca940c793578a0406b7dc4c28239dfb4441f0"
+    image: "ghcr.io/eiiot/appdrop-tinfoil-probe@sha256:dac5db7a57996e06800092d08f00af5b2e4d1f6805ccb2eeea7c6c51adabefbd" # v0.2.1
     attestation: true
     networks: [public]
 
