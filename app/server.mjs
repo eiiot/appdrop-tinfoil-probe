@@ -10,7 +10,7 @@ import { KeyServer } from "./keyServer.mjs";
 import { remoteHost } from "./remoteHost.mjs";
 import { tinfoilPlatform } from "./tinfoil.mjs";
 
-const VERSION = "v0.2.0";
+const VERSION = "v0.2.1";
 const config = JSON.parse(readFileSync(new URL("./config.json", import.meta.url), "utf8"));
 const { HOST_URL, OPERATOR_TOKEN } = process.env;
 
