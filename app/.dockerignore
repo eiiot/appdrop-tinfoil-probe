@@ -1,7 +1,11 @@
 *
 !Dockerfile
 !package.json
-!config.json
-!*.mjs
-!roughtime/
-!roughtime/**
+!package-lock.json
+!shared
+!shared/*.mjs
+!enclave
+!enclave/*.mjs
+!enclave/config.json
+!enclave/roughtime
+!enclave/roughtime/**
