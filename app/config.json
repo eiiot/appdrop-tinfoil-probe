@@ -1,0 +1,22 @@
+{
+  "admins": [
+    {
+      "owner": "ana",
+      "credentialId": "cPAOz8rW_P3RA93oQiSzWw",
+      "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEvNE8saUZOEGoihx2h48730+xADr2G7ttg0vyBXbxZjRoF/OIOoqTfQVtj+ppPqd8W8+riwFBKKH/XLkrEozucw=="
+    },
+    {
+      "owner": "ben",
+      "credentialId": "D2X7fI0diBn95oWDwRtgGA",
+      "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEM6Nv0dHN63i2M2SaFpEyo81WkTLxVVhy8LkopmtVj4SVH6xYnH2rnmrDipvbGnoLG4v/chVvWPF6pVl0cZhClg=="
+    },
+    {
+      "owner": "cy",
+      "credentialId": "O-wxWqK775B8i8W7Pjog0g",
+      "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEgWBFYMPgxHy3n+1ad2PRNXPU5tVYGxgjZq8/06BNHtRBwcJqjiB8RSJgkSYx99k/A/B+Zq819H81xKATLRRkOg=="
+    }
+  ],
+  "threshold": 2,
+  "delayMs": 300000,
+  "watcherPublicKey": "MCowBQYDK2VwAyEAGRbq2PTQoBPqECkb1xbwnvCHHitunnoJD4DHArF6Q/k="
+}
