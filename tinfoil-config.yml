@@ -19,4 +19,5 @@ shim:
   upstream-port: 8080
   paths:
     - /health
+    - /probe
     - /rpc/*

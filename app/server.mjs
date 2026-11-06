@@ -5,12 +5,14 @@
 import http from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { unb64 } from "./crypto.mjs";
 import { KeyServer } from "./keyServer.mjs";
 import { remoteHost } from "./remoteHost.mjs";
 import { tinfoilPlatform } from "./tinfoil.mjs";
 
-const VERSION = "v0.2.3";
+const VERSION = "v0.3.0";
 const config = JSON.parse(readFileSync(new URL("./config.json", import.meta.url), "utf8"));
 const { HOST_URL, OPERATOR_TOKEN } = process.env;
 
@@ -52,6 +54,14 @@ const send = (res, status, value) => {
 http.createServer(async (req, res) => {
   const { pathname } = new URL(req.url, "http://node");
   try {
+    if (req.method === "GET" && pathname === "/probe") {
+      // Can this enclave reach Roughtime (UDP) and staging Rekor (HTTPS)?
+      const roughtime = await promisify(execFile)("roughtime", [], { timeout: 30000 })
+        .then(({ stdout }) => stdout.trim().split("\n").map((l) => JSON.parse(l)), (e) => ({ error: e.message }));
+      const rekor = await fetch("https://rekor.sigstage.dev/api/v1/log/publicKey")
+        .then(async (r) => ({ status: r.status, key: (await r.text()).slice(27, 60) }), (e) => ({ error: e.message }));
+      return send(res, 200, { now: Date.now(), roughtime, rekor });
+    }
     if (req.method === "GET" && pathname === "/health") {
       return send(res, 200, { ok: true, version: VERSION, measurement: platform?.measurement ?? null });
     }

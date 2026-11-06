@@ -3,3 +3,5 @@
 !package.json
 !config.json
 !*.mjs
+!roughtime/
+!roughtime/**
