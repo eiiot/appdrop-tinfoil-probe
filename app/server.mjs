@@ -1,35 +1,49 @@
-import http from 'node:http';
-import https from 'node:https';
-import { WebSocketServer } from 'ws';
+// Key server node, step 1: prove which build this is and which keys it holds.
+// GET /attestation?challenge=<64 hex> asks the hardware for a fresh attestation
+// whose nonce is SHA-256 of this node's public keys and the caller's challenge,
+// so the attestation vouches for exactly these keys, right now.
+import http from "node:http";
+import { canonical, sha256, signingKey, boxKey } from "./crypto.mjs";
 
-// This probe accepts only disposable test bytes. No device or account state.
-const server = http.createServer((req, res) => {
-  res.setHeader('content-type', 'application/json');
-  res.setHeader('cache-control', 'no-store');
-  if (req.method === 'GET' && req.url === '/health') {
-    res.end(JSON.stringify({ ok: true, probe: 'appdrop-transport-v1' }));
-  } else if (req.method === 'GET' && req.url === '/egress') {
-    const outbound = https.get('https://tuft-rendezvous.fly.dev/', { timeout: 10000 }, upstream => {
-      upstream.resume();
-      res.end(JSON.stringify({ reachable: true, status: upstream.statusCode }));
+const identity = signingKey();
+const box = boxKey();
+const SOCKET = "/tinfoil/attestation.sock";
+
+function fromSocket(path) {
+  return new Promise((resolve, reject) => {
+    const request = http.get({ socketPath: SOCKET, path, timeout: 15000 }, (response) => {
+      const chunks = [];
+      response.on("data", (chunk) => chunks.push(chunk));
+      response.on("end", () => resolve({ status: response.statusCode, body: Buffer.concat(chunks).toString() }));
     });
-    outbound.on('timeout', () => outbound.destroy(new Error('timeout')));
-    outbound.on('error', () => {
-      res.writeHead(502);
-      res.end(JSON.stringify({ reachable: false }));
-    });
-  } else {
-    res.writeHead(404);
-    res.end('{}');
+    request.on("timeout", () => request.destroy(new Error("attestation socket timed out")));
+    request.on("error", reject);
+  });
+}
+
+const send = (res, status, value) => {
+  res.writeHead(status, { "content-type": "application/json", "cache-control": "no-store" });
+  res.end(JSON.stringify(value));
+};
+
+http.createServer(async (req, res) => {
+  const url = new URL(req.url, "http://node");
+  try {
+    if (req.method === "GET" && url.pathname === "/health") {
+      return send(res, 200, { ok: true, identity: identity.publicKey, boxKey: box.publicKey });
+    }
+    if (req.method === "GET" && url.pathname === "/attestation") {
+      const challenge = url.searchParams.get("challenge") ?? "";
+      if (!/^[0-9a-f]{64}$/.test(challenge)) return send(res, 400, { error: "challenge must be 64 hex characters" });
+      const userData = { identity: identity.publicKey, boxKey: box.publicKey, challenge };
+      const nonce = sha256(canonical(userData)).toString("hex");
+      const { status, body } = await fromSocket(`/.well-known/tinfoil-attestation?nonce=${nonce}`);
+      let attestation = body;
+      try { attestation = JSON.parse(body); } catch {}
+      return send(res, status === 200 ? 200 : 502, { userData, nonce, socketStatus: status, attestation });
+    }
+    send(res, 404, { error: "not found" });
+  } catch (error) {
+    send(res, 500, { error: error.message });
   }
-});
-const sockets = new WebSocketServer({ noServer: true, maxPayload: 65536, perMessageDeflate: false });
-server.on('upgrade', (req, socket, head) => {
-  if (req.url !== '/ws') return socket.destroy();
-  sockets.handleUpgrade(req, socket, head, ws => sockets.emit('connection', ws));
-});
-sockets.on('connection', ws => {
-  ws.on('error', () => {});
-  ws.on('message', (bytes, isBinary) => ws.send(bytes, { binary: isBinary }));
-});
-server.listen(Number(process.env.PORT || 8080), '0.0.0.0');
+}).listen(Number(process.env.PORT || 8080), "0.0.0.0");

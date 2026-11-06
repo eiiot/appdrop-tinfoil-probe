@@ -1,7 +1,6 @@
 {
-  "name": "appdrop-evervault-transport-probe",
+  "name": "keyserver-node",
   "private": true,
   "type": "module",
-  "scripts": { "start": "node server.mjs" },
-  "dependencies": { "ws": "^8.18.3" }
+  "scripts": { "start": "node server.mjs" }
 }
